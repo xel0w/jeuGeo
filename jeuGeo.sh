@@ -85,19 +85,19 @@ function jouer_jeu_geo() {
   
   while [ $nb_vies -gt 0 ]; do
     read -p "Nombre d'habitants : " nb_habitants
-     
-  if [ $nb_habitants -eq $nb_habitants_estime ]; then
-    echo "Bravo ! Vous avez trouvé le nombre d'habitants dans la ville ${communes_array[$user_input]}."
-    return 0
-  elif [ $nb_habitants -lt $nb_habitants_estime ]; then
-    echo "Plus grand !"
-  else
-    echo "Plus petit !"
-  fi
-  nb_vies=$((nb_vies - 1))
-  echo "Il vous reste $nb_vies vies."
+    
+    if [[ $nb_habitants =~ ^[0-9]+$ ]]; then
+echo "Bravo ! Vous avez trouvé le nombre d'habitants dans la ville ${communes_array[$user_input]}."
+return 0
+elif [ $nb_habitants -lt $nb_habitants_estime ]; then
+echo "Plus grand !"
 else
-  echo "Saisie invalide. Veuillez saisir un nombre entier."
+echo "Plus petit !"
+fi
+nb_vies=$((nb_vies - 1))
+echo "Il vous reste $nb_vies vies."
+else
+echo "Saisie invalide. Veuillez saisir un nombre entier."
 fi
 done
 
