@@ -11,9 +11,9 @@ function cpValid() {
 
 function getCommunes() {
   local code=$1
-  local url="https://geo.api.gouv.fr/communes?codePostal=$code&fields=nom"
+  local url="https://geo.api.gouv.fr/communes?codePostal=$code&fields=nom,code"
   local response=$(curl -s "$url")
-  local communes=($(echo "$response" | jq -r '.[].nom'))
+  local communes=($(echo "$response" | jq -r '.[] | .nom + "," + .code'))
   echo "${communes[@]}"
 }
 
@@ -47,7 +47,8 @@ function play() {
   
   echo ""
   
-  local chosen_commune="${communes[$choice]}"
+ local chosen_commune="${communes[$choice]}"
+local code_insee=$(echo "$chosen_commune" | cut -d "," -f 2)
   
   echo "Vous avez choisi : $chosen_commune"
   echo "Devinez le nombre d'habitants :"
@@ -55,8 +56,8 @@ function play() {
   while [[ $lives -gt 0 ]]; do
     read -p "Entrez un nombre entier : " answer
     if [[ $answer =~ ^[0-9]+$ ]]; then
-      local population=$(curl -s "https://geo.api.gouv.fr/communes?nom=$chosen_commune&fields=population")
-      local target_population=$(echo $population | jq -r '.[0].population')
+        local population=$(curl -s "https://geo.api.gouv.fr/communes/$code_insee?fields=population")
+        local target_population=$(echo "$population" | jq -r '.population')
       
       if [[ $answer -gt $target_population ]]; then
         echo "Moins"
