@@ -56,7 +56,7 @@ function play_game() {
   while [[ $lives -gt 0 ]]; do
     read -p "Entrez un nombre entier : " answer
     if [[ $answer =~ ^[0-9]+$ ]]; then
-      local population=$(curl -s "https://geo.api.gouv.fr/communes?nom=$chosen_commune&fields=population")
+      local population=$(curl -s "https://geo.api.gouv.fr/communes?nom=$chosen_commune&codePostal=$code&fields=population")
       local target_population=$(echo $population | jq -r '.[0].population')
       
       if [[ $answer -gt $target_population ]]; then
