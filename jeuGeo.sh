@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Fonction pour vérifier si un argument est un code postal valide (5 chiffres)
-function is_valid_postal_code() {
+function cpValid() {
   local code=$1
   if [[ $code =~ ^[0-9]{5}$ ]]; then
     return 0
@@ -10,24 +9,22 @@ function is_valid_postal_code() {
   fi
 }
 
-# Fonction pour récupérer les informations sur les communes correspondantes à un code postal
-function get_communes() {
+function getCommunes() {
   local code=$1
   local url="https://geo.api.gouv.fr/communes?codePostal=$code&fields=nom"
-  local response=$(curl -s $url)
-  echo $response | jq -r '.[].nom'
+  local response=$(curl -s "$url")
+  local communes=($(echo "$response" | jq -r '.[].nom'))
+  echo "${communes[@]}"
 }
 
 # Fonction principale du jeu
-function play_game() {
+function play() {
   local code=$1
-  local communes=($(get_communes $code))
+  local communes=($(getCommunes $code))
   local num_communes=${#communes[@]}
   local lives=10
   local answer=""
   
-  echo "Bienvenue dans le jeu GEO !"
-  echo "Vous devez deviner le nombre d'habitants d'une commune."
   echo "Choisissez une commune parmi les suivantes :"
   
   for ((i=0; i<num_communes; i++)); do
@@ -60,38 +57,37 @@ function play_game() {
       local target_population=$(echo $population | jq -r '.[0].population')
       
       if [[ $answer -gt $target_population ]]; then
-        echo "Moins !"
+        echo "Moins"
       elif [[ $answer -lt $target_population ]]; then
-        echo "Plus !"
+        echo "Plus"
       else
-        echo "Félicitations ! Vous avez trouvé le bon nombre d'habitants."
+        echo "Vous avez trouvé le bon nombre d'habitants."
         return 0
       fi
       
       lives=$((lives-1))
       echo "Vies restantes : $lives"
     else
-      echo "Nombre invalide. Veuillez réessayer."
+      echo "Nombre invalide."
     fi
   done
   
-  echo "Vous avez épuisé toutes vos vies. Le nombre d'habitants était $target_population."
+  echo "Perdu. Le nombre d'habitants était $target_population."
   return 1
 }
 
-# Point d'entrée du script
 
-if [[ $# -gt 0 ]] && is_valid_postal_code $1; then
-  play_game $1
+if [[ $# -gt 0 ]] && cpValid $1; then
+  play $1
 else
   while true; do
-    read -p "Veuillez saisir un code postal valide : " code
-    if is_valid_postal_code $code;
+    read -p "Saisissez un code postal valide : " code
+    if cpValid $code;
     then
-      play_game $code
+      play $code
       break
     else
-      echo "Code postal invalide. Veuillez réessayer."
+      echo "Code postal invalide."
     fi
   done
 fi
