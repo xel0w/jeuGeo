@@ -17,6 +17,7 @@ function getCommunes() {
   echo "${communes[@]}"
 }
 
+
 # Fonction principale du jeu
 function play() {
   local code=$1
@@ -24,6 +25,7 @@ function play() {
   local num_communes=${#communes[@]}
   local lives=10
   local answer=""
+
   
   echo "Choisissez une commune parmi les suivantes :"
   
@@ -53,7 +55,7 @@ function play() {
   while [[ $lives -gt 0 ]]; do
     read -p "Entrez un nombre entier : " answer
     if [[ $answer =~ ^[0-9]+$ ]]; then
-      local population=$(curl -s "https://geo.api.gouv.fr/communes?nom=$chosen_commune&codePostal=$code&fields=population")
+      local population=$(curl -s "https://geo.api.gouv.fr/communes?nom=$chosen_commune&fields=population")
       local target_population=$(echo $population | jq -r '.[0].population')
       
       if [[ $answer -gt $target_population ]]; then
