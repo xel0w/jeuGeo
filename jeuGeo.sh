@@ -84,42 +84,44 @@ function jouer_jeu_geo() {
   echo "Devinez le nombre d'habitants dans la ville ${communes_array[$user_input]}."
   
   while [ $nb_vies -gt 0 ]; do
-    read -p "Nombre d'habitants : " nb_habitants
-    
-    if [[ $nb_habitants =~ ^[0-9]+$ ]]; then
-echo "Bravo ! Vous avez trouvé le nombre d'habitants dans la ville ${communes_array[$user_input]}."
-return 0
-elif [ $nb_habitants -lt $nb_habitants_estime ]; then
-echo "Plus grand !"
-else
-echo "Plus petit !"
-fi
-nb_vies=$((nb_vies - 1))
-echo "Il vous reste $nb_vies vies."
-else
-echo "Saisie invalide. Veuillez saisir un nombre entier."
-fi
-done
+    read -    p "Nombre d'habitants : " nb_habitants
 
-echo "Désolé, vous avez perdu ! Le nombre d'habitants dans la ville ${communes_array[$user_input]} était $nb_habitants_estime."
+    if [[ $nb_habitants =~ ^[0-9]+$ ]]; then
+      if [ $nb_habitants -eq $nb_habitants_estime ]; then
+        echo "Bravo ! Vous avez trouvé le nombre d'habitants dans la ville ${communes_array[$user_input]}."
+        return 0
+      elif [ $nb_habitants -lt $nb_habitants_estime ]; then
+        echo "Plus grand !"
+      else
+        echo "Plus petit !"
+      fi
+      nb_vies=$((nb_vies - 1))
+      echo "Il vous reste $nb_vies vies."
+    else
+      echo "Saisie invalide. Veuillez saisir un nombre entier."
+    fi
+  done
+
+  echo "Désolé, vous avez perdu ! Le nombre d'habitants dans la ville ${communes_array[$user_input]} était $nb_habitants_estime."
 }
 
-#Vérification de la présence d'un argument
+# Vérification de la présence d'un argument
 if [ $# -eq 1 ]; then
-code_postal=$1
+  code_postal=$1
 else
-while true; do
-read -p "Veuillez saisir un code postal : " code_postal
-if est_code_postal_valide $code_postal; then
-break
-else
-echo "Code postal invalide. Veuillez saisir un code postal valide."
-fi
-done
+  while true; do
+    read -p "Veuillez saisir un code postal : " code_postal
+    if est_code_postal_valide $code_postal; then
+      break
+    else
+      echo "Code postal invalide. Veuillez saisir un code postal valide."
+    fi
+  done
 fi
 
-#Récupération des informations sur les communes correspondantes au code postal
+# Récupération des informations sur les communes correspondantes au code postal
 recuperer_informations_communes $code_postal $2
 
-#Jeu GEO
+# Jeu GEO
 jouer_jeu_geo "${communes_array[@]}"
+
